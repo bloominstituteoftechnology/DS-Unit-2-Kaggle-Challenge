@@ -80,10 +80,10 @@ def get_acc_rec_fone(y_true, y_pred, verbose=False, title='TEST'):
         'Recall':rec_,
         'F Score':fscore_,
         'Support':sprt_
-    }, index=y_train.unique())
+    }, index=y_true.unique())
     if verbose:
         print(f'-------- {title} SET --------')
-        print(f'Accuracy Score: {acc_:.2f}')
+        print(f'Accuracy Score: {acc_:.4f}')
         print(df)
     return results
 
@@ -147,10 +147,10 @@ def get_rmse_mae_r2(y_true, y_pred, verbose=False, title='TEST'):
     results['RMSE'] = rmse_
     if verbose:
         print(f'-------- {title} SET --------')
-        print(f'R^2: {r_square:.2f}')
-        print(f'MSE: {mse:.2f}')
-        print(f'RMSE: {rmse:.2f}')
-        print(f'MAE: {mae:.2f}')
+        print(f'R^2: {r_square:.4f}')
+        print(f'MSE: {mse:.4f}')
+        print(f'RMSE: {rmse:.4f}')
+        print(f'MAE: {mae:.4f}')
     return results
 
 
@@ -512,3 +512,18 @@ def plot_scatter_by_groups(df, x_col, y_col, group_by_col, colors=None, alpha=0.
         ax.scatter(x, y, label=label, alpha=alpha)
     plt.show()
     plt.close()
+
+def subset_features(train, val, test, features, target):
+    X_train = train[features]
+    y_train = train[target]
+    X_val = val[features]
+    y_val = val[target]
+    X_test = test[features]
+    return X_train, X_val, X_test, y_train, y_val
+
+def print_shape(train, val, test=None, title='Train/Val'):
+    print('------- SHAPE - {} ---------'.format(title))
+    print(f'Training Set: {train.shape}')
+    print(f'Validation Set: {val.shape}')
+    if test is not None:
+        print(f'Testing Set: {test.shape}')
