@@ -81,7 +81,34 @@ def cluster(df, n_clusters=100, kmeans=None):
 	return(df, kmeans)
 
 #%%
-def clean(df, n_clusters=100, kmeans=None):
+from typing import Optional
+
+def keepTopN(	column:pandas.Series,
+				n:int,
+				default:Optional[object] = None) -> pandas.Series:
+	"""
+	Keeps the top n most popular values of a Series, while replacing the rest with `default`
+	
+	Args:
+		column (pandas.Series): Series to operate on
+		n (int): How many values to keep
+		default (object, optional): Defaults to NaN. Value with which to replace remaining values
+	
+	Returns:
+		pandas.Series: Series with the most popular n values
+	"""
+	import numpy
+
+	if default is None: default = numpy.nan
+
+	val_counts = column.value_counts()
+	if n > len(val_counts): n = len(val_counts)
+	top_n = list(val_counts[:n].index)
+	return(column.where(column.isin(top_n), other=default))
+
+#%%
+
+def clean(df, n_clusters=100, kmeans=None, n=50):
 	cleaned = df.copy()
 	cleaned, kmeans = cluster(cleaned, n_clusters=n_clusters, kmeans=kmeans)
 
@@ -92,7 +119,13 @@ def clean(df, n_clusters=100, kmeans=None):
 	cleaned['year_recorded'] = cleaned['date_recorded_dt'].dt.year
 	cleaned['years_in_operation'] = cleaned['year_recorded'] - cleaned['construction_year']
 
+	for column in cleaned.columns[cleaned.dtypes=='object']:
+		cleaned[column] = keepTopN(cleaned[column], n=n, default='other')
+
 	return(cleaned.drop(columns=['date_recorded_dt']), kmeans)
+
+#%%
+# cleaned.dtypes
 
 #%%
 
@@ -114,11 +147,10 @@ _oe = ce.OrdinalEncoder()
 _rfc = RandomForestClassifier(random_state=3)
 
 params = {
-	'RandomForestClassifier__n_estimators': randint(3,300),
-	'RandomForestClassifier__min_samples_leaf': randint(1,200),
+	'RandomForestClassifier__n_estimators': [30,90,270],
+	'RandomForestClassifier__min_samples_leaf': [3,10,20],
 	'RandomForestClassifier__oob_score': [True, False],
-	'RandomForestClassifier__criterion': ['gini', 'entropy'],
-	'RandomForestClassifier__verbose': [3]
+	'RandomForestClassifier__criterion': ['gini']
 }
 
 # n_estimators = 1000, min_samples_leaf = 2
@@ -128,8 +160,8 @@ pipeline = Pipeline([	('OrdinalEncoder', _oe),
 
 searchCV = RandomizedSearchCV(	pipeline,
 								param_distributions=params,
-								n_iter=15,
-								cv=3,
+								n_iter=9,
+								cv=9,
 								scoring='accuracy',
 								verbose=10,
 								return_train_score=True,
@@ -142,7 +174,22 @@ train_target_encoded
 searchCV.fit(train_features, train_target_encoded)
 
 #%%
-# y_val
+print('Best hyperparameters', searchCV.best_params_)
+print('Cross-validation accuracy', searchCV.best_score_)
+
+#%%
+out = test_features[['id']].copy()
+
+#%%
+out['status_group'] = searchCV.best_estimator_.predict(test_features)
+
+#%%
+out['status_group'] = target_encoder.inverse_transform(out['status_group'])
+
+out.sort_values(by='id').to_csv('./module3/results.csv', index=False)
+
+#%%
+
 
 #%%
 # print(f'Validation accuracy: {pipeline.score(X_val, y_val)}')
