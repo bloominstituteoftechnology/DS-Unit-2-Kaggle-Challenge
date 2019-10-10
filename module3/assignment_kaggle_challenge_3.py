@@ -108,7 +108,7 @@ def keepTopN(	column:pandas.Series,
 
 #%%
 
-def clean(df, n_clusters=100, kmeans=None, n=50):
+def clean(df, n_clusters=250, kmeans=None, n=250):
 	cleaned = df.copy()
 	cleaned, kmeans = cluster(cleaned, n_clusters=n_clusters, kmeans=kmeans)
 
@@ -147,9 +147,9 @@ _oe = ce.OrdinalEncoder()
 _rfc = RandomForestClassifier(random_state=3)
 
 params = {
-	'RandomForestClassifier__n_estimators': [30,90,270],
-	'RandomForestClassifier__min_samples_leaf': [3,10,20],
-	'RandomForestClassifier__oob_score': [True, False],
+	'RandomForestClassifier__n_estimators': [870],
+	'RandomForestClassifier__min_samples_leaf': [3],
+	'RandomForestClassifier__oob_score': [False],
 	'RandomForestClassifier__criterion': ['gini']
 }
 
@@ -160,7 +160,7 @@ pipeline = Pipeline([	('OrdinalEncoder', _oe),
 
 searchCV = RandomizedSearchCV(	pipeline,
 								param_distributions=params,
-								n_iter=9,
+								n_iter=1,
 								cv=9,
 								scoring='accuracy',
 								verbose=10,
