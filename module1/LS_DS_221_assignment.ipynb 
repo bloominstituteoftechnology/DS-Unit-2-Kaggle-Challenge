@@ -1,0 +1,1156 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "assignment_kaggle_challenge_1.ipynb",
+      "provenance": [],
+      "collapsed_sections": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.7.3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/mvkumar14/DS-Unit-2-Kaggle-Challenge/blob/master/module1/LS_DS_221_assignment.ipynb%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "GjPwAV9atnsP",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import numpy as np"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "lTzM9YDMWWvG",
+        "colab_type": "text"
+      },
+      "source": [
+        "Lambda School Data Science\n",
+        "\n",
+        "*Unit 2, Sprint 2, Module 1*\n",
+        "\n",
+        "---"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "colab_type": "text",
+        "id": "7IXUfiQ2UKj6"
+      },
+      "source": [
+        "# Decision Trees\n",
+        "\n",
+        "## Assignment\n",
+        "- [ ] [Sign up for a Kaggle account](https://www.kaggle.com/), if you don’t already have one. Go to our Kaggle InClass competition website. You will be given the URL in Slack. Go to the Rules page. Accept the rules of the competition.\n",
+        "- [ ] Do train/validate/test split with the Tanzania Waterpumps data.\n",
+        "- [ ] Begin with baselines for classification.\n",
+        "- [ ] Select features. Use a scikit-learn pipeline to encode categoricals, impute missing values, and fit a decision tree classifier.\n",
+        "- [ ] Get your validation accuracy score.\n",
+        "- [ ] Get and plot your feature importances.\n",
+        "- [ ] Submit your predictions to our Kaggle competition. (Go to our Kaggle InClass competition webpage. Use the blue **Submit Predictions** button to upload your CSV file. Or you can use the Kaggle API to submit your predictions.)\n",
+        "- [ ] Commit your notebook to your fork of the GitHub repo.\n",
+        "\n",
+        "\n",
+        "## Stretch Goals\n",
+        "\n",
+        "### Reading\n",
+        "\n",
+        "- A Visual Introduction to Machine Learning\n",
+        "  - [Part 1: A Decision Tree](http://www.r2d3.us/visual-intro-to-machine-learning-part-1/)\n",
+        "  - [Part 2: Bias and Variance](http://www.r2d3.us/visual-intro-to-machine-learning-part-2/)\n",
+        "- [Decision Trees: Advantages & Disadvantages](https://christophm.github.io/interpretable-ml-book/tree.html#advantages-2)\n",
+        "- [How a Russian mathematician constructed a decision tree — by hand — to solve a medical problem](http://fastml.com/how-a-russian-mathematician-constructed-a-decision-tree-by-hand-to-solve-a-medical-problem/)\n",
+        "- [How decision trees work](https://brohrer.github.io/how_decision_trees_work.html)\n",
+        "- [Let’s Write a Decision Tree Classifier from Scratch](https://www.youtube.com/watch?v=LDRbO9a6XPU) — _Don’t worry about understanding the code, just get introduced to the concepts. This 10 minute video has excellent diagrams and explanations._\n",
+        "- [Random Forests for Complete Beginners: The definitive guide to Random Forests and Decision Trees](https://victorzhou.com/blog/intro-to-random-forests/)\n",
+        "\n",
+        "\n",
+        "### Doing\n",
+        "- [ ] Add your own stretch goal(s) !\n",
+        "- [ ] Define a function to wrangle train, validate, and test sets in the same way. Clean outliers and engineer features. (For example, [what columns have zeros and shouldn't?](https://github.com/Quartz/bad-data-guide#zeros-replace-missing-values) What columns are duplicates, or nearly duplicates? Can you extract the year from date_recorded? Can you engineer new features, such as the number of years from waterpump construction to waterpump inspection?)\n",
+        "- [ ] Try other [scikit-learn imputers](https://scikit-learn.org/stable/modules/impute.html).\n",
+        "- [ ] Make exploratory visualizations and share on Slack.\n",
+        "\n",
+        "\n",
+        "#### Exploratory visualizations\n",
+        "\n",
+        "Visualize the relationships between feature(s) and target. I recommend you do this with your training set, after splitting your data. \n",
+        "\n",
+        "For this problem, you may want to create a new column to represent the target as a number, 0 or 1. For example:\n",
+        "\n",
+        "```python\n",
+        "train['functional'] = (train['status_group']=='functional').astype(int)\n",
+        "```\n",
+        "\n",
+        "\n",
+        "\n",
+        "You can try [Seaborn \"Categorical estimate\" plots](https://seaborn.pydata.org/tutorial/categorical.html) for features with reasonably few unique values. (With too many unique values, the plot is unreadable.)\n",
+        "\n",
+        "- Categorical features. (If there are too many unique values, you can replace less frequent values with \"OTHER.\")\n",
+        "- Numeric features. (If there are too many unique values, you can [bin with pandas cut / qcut functions](https://pandas.pydata.org/pandas-docs/stable/getting_started/basics.html?highlight=qcut#discretization-and-quantiling).)\n",
+        "\n",
+        "You can try [Seaborn linear model plots](https://seaborn.pydata.org/tutorial/regression.html) with numeric features. For this classification problem, you may want to use the parameter `logistic=True`, but it can be slow.\n",
+        "\n",
+        "You do _not_ need to use Seaborn, but it's nice because it includes confidence intervals to visualize uncertainty.\n",
+        "\n",
+        "#### High-cardinality categoricals\n",
+        "\n",
+        "This code from a previous assignment demonstrates how to replace less frequent values with 'OTHER'\n",
+        "\n",
+        "```python\n",
+        "# Reduce cardinality for NEIGHBORHOOD feature ...\n",
+        "\n",
+        "# Get a list of the top 10 neighborhoods\n",
+        "top10 = train['NEIGHBORHOOD'].value_counts()[:10].index\n",
+        "\n",
+        "# At locations where the neighborhood is NOT in the top 10,\n",
+        "# replace the neighborhood with 'OTHER'\n",
+        "train.loc[~train['NEIGHBORHOOD'].isin(top10), 'NEIGHBORHOOD'] = 'OTHER'\n",
+        "test.loc[~test['NEIGHBORHOOD'].isin(top10), 'NEIGHBORHOOD'] = 'OTHER'\n",
+        "```\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab_type": "code",
+        "id": "o9eSnDYhUGD7",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 316
+        },
+        "outputId": "60b693ca-2849-4b1b-f314-f43cf837ae7d"
+      },
+      "source": [
+        "import sys\n",
+        "\n",
+        "# If you're on Colab:\n",
+        "if 'google.colab' in sys.modules:\n",
+        "    DATA_PATH = 'https://raw.githubusercontent.com/LambdaSchool/DS-Unit-2-Kaggle-Challenge/master/data/'\n",
+        "    !pip install category_encoders==2.*\n",
+        "\n",
+        "# If you're working locally:\n",
+        "else:\n",
+        "    DATA_PATH = '../data/'"
+      ],
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Collecting category_encoders==2.*\n",
+            "\u001b[?25l  Downloading https://files.pythonhosted.org/packages/a0/52/c54191ad3782de633ea3d6ee3bb2837bda0cf3bc97644bb6375cf14150a0/category_encoders-2.1.0-py2.py3-none-any.whl (100kB)\n",
+            "\r\u001b[K     |███▎                            | 10kB 16.5MB/s eta 0:00:01\r\u001b[K     |██████▌                         | 20kB 3.1MB/s eta 0:00:01\r\u001b[K     |█████████▉                      | 30kB 4.4MB/s eta 0:00:01\r\u001b[K     |█████████████                   | 40kB 3.0MB/s eta 0:00:01\r\u001b[K     |████████████████▍               | 51kB 3.6MB/s eta 0:00:01\r\u001b[K     |███████████████████▋            | 61kB 4.3MB/s eta 0:00:01\r\u001b[K     |██████████████████████▉         | 71kB 4.9MB/s eta 0:00:01\r\u001b[K     |██████████████████████████▏     | 81kB 5.6MB/s eta 0:00:01\r\u001b[K     |█████████████████████████████▍  | 92kB 6.2MB/s eta 0:00:01\r\u001b[K     |████████████████████████████████| 102kB 3.1MB/s \n",
+            "\u001b[?25hRequirement already satisfied: scikit-learn>=0.20.0 in /usr/local/lib/python3.6/dist-packages (from category_encoders==2.*) (0.21.3)\n",
+            "Requirement already satisfied: scipy>=0.19.0 in /usr/local/lib/python3.6/dist-packages (from category_encoders==2.*) (1.3.1)\n",
+            "Requirement already satisfied: statsmodels>=0.6.1 in /usr/local/lib/python3.6/dist-packages (from category_encoders==2.*) (0.10.1)\n",
+            "Requirement already satisfied: numpy>=1.11.3 in /usr/local/lib/python3.6/dist-packages (from category_encoders==2.*) (1.17.3)\n",
+            "Requirement already satisfied: patsy>=0.4.1 in /usr/local/lib/python3.6/dist-packages (from category_encoders==2.*) (0.5.1)\n",
+            "Requirement already satisfied: pandas>=0.21.1 in /usr/local/lib/python3.6/dist-packages (from category_encoders==2.*) (0.25.2)\n",
+            "Requirement already satisfied: joblib>=0.11 in /usr/local/lib/python3.6/dist-packages (from scikit-learn>=0.20.0->category_encoders==2.*) (0.14.0)\n",
+            "Requirement already satisfied: six in /usr/local/lib/python3.6/dist-packages (from patsy>=0.4.1->category_encoders==2.*) (1.12.0)\n",
+            "Requirement already satisfied: python-dateutil>=2.6.1 in /usr/local/lib/python3.6/dist-packages (from pandas>=0.21.1->category_encoders==2.*) (2.6.1)\n",
+            "Requirement already satisfied: pytz>=2017.2 in /usr/local/lib/python3.6/dist-packages (from pandas>=0.21.1->category_encoders==2.*) (2018.9)\n",
+            "Installing collected packages: category-encoders\n",
+            "Successfully installed category-encoders-2.1.0\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab_type": "code",
+        "id": "QJBD4ruICm1m",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 36
+        },
+        "outputId": "138e3ee8-c41c-498b-e728-0c340aea0f64"
+      },
+      "source": [
+        "import pandas as pd\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "\n",
+        "train = pd.merge(pd.read_csv(DATA_PATH+'waterpumps/train_features.csv'), \n",
+        "                 pd.read_csv(DATA_PATH+'waterpumps/train_labels.csv'))\n",
+        "test = pd.read_csv(DATA_PATH+'waterpumps/test_features.csv')\n",
+        "sample_submission = pd.read_csv(DATA_PATH+'waterpumps/sample_submission.csv')\n",
+        "train_percent = 0.80\n",
+        "train,val = train_test_split(train,train_size=train_percent,stratify = train['status_group'],random_state=26)\n",
+        "\n",
+        "train.shape,val.shape, test.shape"
+      ],
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "((47520, 41), (11880, 41), (14358, 40))"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "VWkT04-Qh8gP",
+        "colab_type": "text"
+      },
+      "source": [
+        "##Data Exploration:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab_type": "code",
+        "id": "2Amxyx3xphbb",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 417
+        },
+        "outputId": "39e178a8-dd51-4bf0-d66d-505e2b27cb98"
+      },
+      "source": [
+        "train.head()"
+      ],
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>id</th>\n",
+              "      <th>amount_tsh</th>\n",
+              "      <th>date_recorded</th>\n",
+              "      <th>funder</th>\n",
+              "      <th>gps_height</th>\n",
+              "      <th>installer</th>\n",
+              "      <th>longitude</th>\n",
+              "      <th>latitude</th>\n",
+              "      <th>wpt_name</th>\n",
+              "      <th>num_private</th>\n",
+              "      <th>basin</th>\n",
+              "      <th>subvillage</th>\n",
+              "      <th>region</th>\n",
+              "      <th>region_code</th>\n",
+              "      <th>district_code</th>\n",
+              "      <th>lga</th>\n",
+              "      <th>ward</th>\n",
+              "      <th>population</th>\n",
+              "      <th>public_meeting</th>\n",
+              "      <th>recorded_by</th>\n",
+              "      <th>scheme_management</th>\n",
+              "      <th>scheme_name</th>\n",
+              "      <th>permit</th>\n",
+              "      <th>construction_year</th>\n",
+              "      <th>extraction_type</th>\n",
+              "      <th>extraction_type_group</th>\n",
+              "      <th>extraction_type_class</th>\n",
+              "      <th>management</th>\n",
+              "      <th>management_group</th>\n",
+              "      <th>payment</th>\n",
+              "      <th>payment_type</th>\n",
+              "      <th>water_quality</th>\n",
+              "      <th>quality_group</th>\n",
+              "      <th>quantity</th>\n",
+              "      <th>quantity_group</th>\n",
+              "      <th>source</th>\n",
+              "      <th>source_type</th>\n",
+              "      <th>source_class</th>\n",
+              "      <th>waterpoint_type</th>\n",
+              "      <th>waterpoint_type_group</th>\n",
+              "      <th>status_group</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>11222</th>\n",
+              "      <td>72806</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>2011-08-04</td>\n",
+              "      <td>Government Of Tanzania</td>\n",
+              "      <td>0</td>\n",
+              "      <td>DWE</td>\n",
+              "      <td>30.607058</td>\n",
+              "      <td>-1.204043</td>\n",
+              "      <td>Kihinda Shuleni</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Lake Victoria</td>\n",
+              "      <td>Kihinda</td>\n",
+              "      <td>Kagera</td>\n",
+              "      <td>18</td>\n",
+              "      <td>1</td>\n",
+              "      <td>Karagwe</td>\n",
+              "      <td>Kibingo</td>\n",
+              "      <td>0</td>\n",
+              "      <td>True</td>\n",
+              "      <td>GeoData Consultants Ltd</td>\n",
+              "      <td>VWC</td>\n",
+              "      <td>Kihinda water sup</td>\n",
+              "      <td>True</td>\n",
+              "      <td>0</td>\n",
+              "      <td>gravity</td>\n",
+              "      <td>gravity</td>\n",
+              "      <td>gravity</td>\n",
+              "      <td>vwc</td>\n",
+              "      <td>user-group</td>\n",
+              "      <td>never pay</td>\n",
+              "      <td>never pay</td>\n",
+              "      <td>soft</td>\n",
+              "      <td>good</td>\n",
+              "      <td>seasonal</td>\n",
+              "      <td>seasonal</td>\n",
+              "      <td>spring</td>\n",
+              "      <td>spring</td>\n",
+              "      <td>groundwater</td>\n",
+              "      <td>communal standpipe</td>\n",
+              "      <td>communal standpipe</td>\n",
+              "      <td>functional</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>375</th>\n",
+              "      <td>19304</td>\n",
+              "      <td>50.0</td>\n",
+              "      <td>2011-03-04</td>\n",
+              "      <td>W.B</td>\n",
+              "      <td>-45</td>\n",
+              "      <td>Phase</td>\n",
+              "      <td>39.183369</td>\n",
+              "      <td>-8.141222</td>\n",
+              "      <td>Mkali</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Rufiji</td>\n",
+              "      <td>Nyampakupwani</td>\n",
+              "      <td>Pwani</td>\n",
+              "      <td>60</td>\n",
+              "      <td>53</td>\n",
+              "      <td>Rufiji</td>\n",
+              "      <td>Chumbi</td>\n",
+              "      <td>1</td>\n",
+              "      <td>True</td>\n",
+              "      <td>GeoData Consultants Ltd</td>\n",
+              "      <td>VWC</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>True</td>\n",
+              "      <td>2006</td>\n",
+              "      <td>mono</td>\n",
+              "      <td>mono</td>\n",
+              "      <td>motorpump</td>\n",
+              "      <td>vwc</td>\n",
+              "      <td>user-group</td>\n",
+              "      <td>pay per bucket</td>\n",
+              "      <td>per bucket</td>\n",
+              "      <td>soft</td>\n",
+              "      <td>good</td>\n",
+              "      <td>enough</td>\n",
+              "      <td>enough</td>\n",
+              "      <td>machine dbh</td>\n",
+              "      <td>borehole</td>\n",
+              "      <td>groundwater</td>\n",
+              "      <td>communal standpipe multiple</td>\n",
+              "      <td>communal standpipe</td>\n",
+              "      <td>non functional</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>21436</th>\n",
+              "      <td>71161</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>2013-01-25</td>\n",
+              "      <td>World Vision</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Consulting Engineer</td>\n",
+              "      <td>32.847674</td>\n",
+              "      <td>-4.204479</td>\n",
+              "      <td>Iguku A</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Lake Tanganyika</td>\n",
+              "      <td>Iguku A</td>\n",
+              "      <td>Tabora</td>\n",
+              "      <td>14</td>\n",
+              "      <td>1</td>\n",
+              "      <td>Nzega</td>\n",
+              "      <td>Kahamanhalaga</td>\n",
+              "      <td>0</td>\n",
+              "      <td>True</td>\n",
+              "      <td>GeoData Consultants Ltd</td>\n",
+              "      <td>VWC</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>False</td>\n",
+              "      <td>0</td>\n",
+              "      <td>nira/tanira</td>\n",
+              "      <td>nira/tanira</td>\n",
+              "      <td>handpump</td>\n",
+              "      <td>vwc</td>\n",
+              "      <td>user-group</td>\n",
+              "      <td>pay when scheme fails</td>\n",
+              "      <td>on failure</td>\n",
+              "      <td>soft</td>\n",
+              "      <td>good</td>\n",
+              "      <td>enough</td>\n",
+              "      <td>enough</td>\n",
+              "      <td>shallow well</td>\n",
+              "      <td>shallow well</td>\n",
+              "      <td>groundwater</td>\n",
+              "      <td>hand pump</td>\n",
+              "      <td>hand pump</td>\n",
+              "      <td>functional</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>11152</th>\n",
+              "      <td>30348</td>\n",
+              "      <td>50.0</td>\n",
+              "      <td>2013-01-20</td>\n",
+              "      <td>Jica</td>\n",
+              "      <td>386</td>\n",
+              "      <td>JICA</td>\n",
+              "      <td>38.569341</td>\n",
+              "      <td>-10.371349</td>\n",
+              "      <td>Kisimani Jica</td>\n",
+              "      <td>0</td>\n",
+              "      <td>Ruvuma / Southern Coast</td>\n",
+              "      <td>Mapinduzi</td>\n",
+              "      <td>Lindi</td>\n",
+              "      <td>8</td>\n",
+              "      <td>3</td>\n",
+              "      <td>Nachingwea</td>\n",
+              "      <td>Mtua</td>\n",
+              "      <td>438</td>\n",
+              "      <td>True</td>\n",
+              "      <td>GeoData Consultants Ltd</td>\n",
+              "      <td>VWC</td>\n",
+              "      <td>Kipara</td>\n",
+              "      <td>True</td>\n",
+              "      <td>2007</td>\n",
+              "      <td>submersible</td>\n",
+              "      <td>submersible</td>\n",
+              "      <td>submersible</td>\n",
+              "      <td>vwc</td>\n",
+              "      <td>user-group</td>\n",
+              "      <td>pay per bucket</td>\n",
+              "      <td>per bucket</td>\n",
+              "      <td>salty</td>\n",
+              "      <td>salty</td>\n",
+              "      <td>insufficient</td>\n",
+              "      <td>insufficient</td>\n",
+              "      <td>machine dbh</td>\n",
+              "      <td>borehole</td>\n",
+              "      <td>groundwater</td>\n",
+              "      <td>communal standpipe multiple</td>\n",
+              "      <td>communal standpipe</td>\n",
+              "      <td>functional needs repair</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>23544</th>\n",
+              "      <td>38929</td>\n",
+              "      <td>0.0</td>\n",
+              "      <td>2011-03-13</td>\n",
+              "      <td>Tardo</td>\n",
+              "      <td>1762</td>\n",
+              "      <td>Tardo</td>\n",
+              "      <td>38.254227</td>\n",
+              "      <td>-4.656549</td>\n",
+              "      <td>Kwa Mzee Anania</td>\n",
+              "      <td>45</td>\n",
+              "      <td>Pangani</td>\n",
+              "      <td>Viti Mjini</td>\n",
+              "      <td>Tanga</td>\n",
+              "      <td>4</td>\n",
+              "      <td>1</td>\n",
+              "      <td>Lushoto</td>\n",
+              "      <td>Shume</td>\n",
+              "      <td>1</td>\n",
+              "      <td>True</td>\n",
+              "      <td>GeoData Consultants Ltd</td>\n",
+              "      <td>VWC</td>\n",
+              "      <td>Kibohelo  forest</td>\n",
+              "      <td>True</td>\n",
+              "      <td>1992</td>\n",
+              "      <td>gravity</td>\n",
+              "      <td>gravity</td>\n",
+              "      <td>gravity</td>\n",
+              "      <td>vwc</td>\n",
+              "      <td>user-group</td>\n",
+              "      <td>never pay</td>\n",
+              "      <td>never pay</td>\n",
+              "      <td>soft</td>\n",
+              "      <td>good</td>\n",
+              "      <td>enough</td>\n",
+              "      <td>enough</td>\n",
+              "      <td>spring</td>\n",
+              "      <td>spring</td>\n",
+              "      <td>groundwater</td>\n",
+              "      <td>communal standpipe</td>\n",
+              "      <td>communal standpipe</td>\n",
+              "      <td>functional</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "          id  amount_tsh  ... waterpoint_type_group             status_group\n",
+              "11222  72806         0.0  ...    communal standpipe               functional\n",
+              "375    19304        50.0  ...    communal standpipe           non functional\n",
+              "21436  71161         0.0  ...             hand pump               functional\n",
+              "11152  30348        50.0  ...    communal standpipe  functional needs repair\n",
+              "23544  38929         0.0  ...    communal standpipe               functional\n",
+              "\n",
+              "[5 rows x 41 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "TUTkJj9KeXyr",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 91
+        },
+        "outputId": "e7bf7725-f79a-4054-d22e-92459233ab54"
+      },
+      "source": [
+        "train.status_group.value_counts(normalize=True)"
+      ],
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "functional                 0.543077\n",
+              "non functional             0.384238\n",
+              "functional needs repair    0.072685\n",
+              "Name: status_group, dtype: float64"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "YkmZT-5wdo2F",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 299
+        },
+        "outputId": "4d55d629-4be5-4889-82f0-29209e287db0"
+      },
+      "source": [
+        "import seaborn as sns\n",
+        "sns.distplot(train.amount_tsh[(train.amount_tsh>000)])\n",
+        "# train.amount_tsh[train.amount_tsh>].describe()\n",
+        "# The fact that it has so many zeroes means that I'm probably not going to use\n",
+        "#this feature? Or when I do use it it would be on a different model that only\n",
+        "#trains on the places I have values for this feature. \n",
+        "#The only thing I would expect is that the extremely large vales might require\n",
+        "#more upkeep. "
+      ],
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<matplotlib.axes._subplots.AxesSubplot at 0x7fc2c8888ba8>"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 8
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "image/png": "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\nKQAAAABJRU5ErkJggg==\n",
+            "text/plain": [
+              "<Figure size 432x288 with 1 Axes>"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "WyJT-ZQoioW2",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 320
+        },
+        "outputId": "271d3605-2bb9-4019-f71f-a6f60b6cd010"
+      },
+      "source": [
+        "train.describe()"
+      ],
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>id</th>\n",
+              "      <th>amount_tsh</th>\n",
+              "      <th>gps_height</th>\n",
+              "      <th>longitude</th>\n",
+              "      <th>latitude</th>\n",
+              "      <th>num_private</th>\n",
+              "      <th>region_code</th>\n",
+              "      <th>district_code</th>\n",
+              "      <th>population</th>\n",
+              "      <th>construction_year</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>count</th>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>4.752000e+04</td>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>47520.000000</td>\n",
+              "      <td>47520.00000</td>\n",
+              "      <td>47520.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>mean</th>\n",
+              "      <td>37114.464162</td>\n",
+              "      <td>326.153322</td>\n",
+              "      <td>668.437079</td>\n",
+              "      <td>34.091034</td>\n",
+              "      <td>-5.720819e+00</td>\n",
+              "      <td>0.471528</td>\n",
+              "      <td>15.277483</td>\n",
+              "      <td>5.620013</td>\n",
+              "      <td>178.26915</td>\n",
+              "      <td>1302.368203</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>std</th>\n",
+              "      <td>21439.379093</td>\n",
+              "      <td>3231.513961</td>\n",
+              "      <td>693.280926</td>\n",
+              "      <td>6.547991</td>\n",
+              "      <td>2.947284e+00</td>\n",
+              "      <td>12.919738</td>\n",
+              "      <td>17.582135</td>\n",
+              "      <td>9.624680</td>\n",
+              "      <td>457.96653</td>\n",
+              "      <td>951.059636</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>min</th>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>-90.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>-1.164944e+01</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>1.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.00000</td>\n",
+              "      <td>0.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>25%</th>\n",
+              "      <td>18543.500000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>33.106467</td>\n",
+              "      <td>-8.564252e+00</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>5.000000</td>\n",
+              "      <td>2.000000</td>\n",
+              "      <td>0.00000</td>\n",
+              "      <td>0.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>50%</th>\n",
+              "      <td>37041.500000</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>368.000000</td>\n",
+              "      <td>34.914356</td>\n",
+              "      <td>-5.045327e+00</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>12.000000</td>\n",
+              "      <td>3.000000</td>\n",
+              "      <td>30.00000</td>\n",
+              "      <td>1986.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>75%</th>\n",
+              "      <td>55587.250000</td>\n",
+              "      <td>25.000000</td>\n",
+              "      <td>1320.000000</td>\n",
+              "      <td>37.180061</td>\n",
+              "      <td>-3.328205e+00</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>17.000000</td>\n",
+              "      <td>5.000000</td>\n",
+              "      <td>215.00000</td>\n",
+              "      <td>2004.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>max</th>\n",
+              "      <td>74247.000000</td>\n",
+              "      <td>350000.000000</td>\n",
+              "      <td>2628.000000</td>\n",
+              "      <td>40.345193</td>\n",
+              "      <td>-2.000000e-08</td>\n",
+              "      <td>1776.000000</td>\n",
+              "      <td>99.000000</td>\n",
+              "      <td>80.000000</td>\n",
+              "      <td>30500.00000</td>\n",
+              "      <td>2013.000000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "                 id     amount_tsh  ...   population  construction_year\n",
+              "count  47520.000000   47520.000000  ...  47520.00000       47520.000000\n",
+              "mean   37114.464162     326.153322  ...    178.26915        1302.368203\n",
+              "std    21439.379093    3231.513961  ...    457.96653         951.059636\n",
+              "min        0.000000       0.000000  ...      0.00000           0.000000\n",
+              "25%    18543.500000       0.000000  ...      0.00000           0.000000\n",
+              "50%    37041.500000       0.000000  ...     30.00000        1986.000000\n",
+              "75%    55587.250000      25.000000  ...    215.00000        2004.000000\n",
+              "max    74247.000000  350000.000000  ...  30500.00000        2013.000000\n",
+              "\n",
+              "[8 rows x 10 columns]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "TbE8TAocsCj6",
+        "colab_type": "text"
+      },
+      "source": [
+        "##Wrangling Function:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "IQlTbuTjsB-B",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "def wrangle(X):\n",
+        "  #Prevent set with copy warning\n",
+        "  X= X.copy()\n",
+        "\n",
+        "  #Latitude has small values around 3 (noise in data should be 0)\n",
+        "  #replace small values with 0\n",
+        "  X['latitude'] = X['latitude'].replace(-2e-08,0)\n",
+        "\n",
+        "  #When there are zeroes for long and lat they should be np.nan\n",
+        "  cols_with_zeroes = ['longitude','latitude']\n",
+        "  for col in cols_with_zeroes:\n",
+        "    X[col] = X[col].replace(0,np.nan)\n",
+        "\n",
+        "  #quantity and quantity_group are duplicates (drop one)\n",
+        "  X = X.drop(columns='quantity_group')\n",
+        "\n",
+        "  #return wrangled data frame\n",
+        "  return X \n",
+        "  \n",
+        "train = wrangle(train)\n",
+        "val = wrangle(val)\n",
+        "test = wrangle(test)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "PkDL0IP_tywg",
+        "colab_type": "text"
+      },
+      "source": [
+        "##Select Features:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "U9ITblDGvs54",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "#Set Target\n",
+        "target = 'status_group'\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "nwkfQuX_v8GA",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 56
+        },
+        "outputId": "dd981c89-3f02-4396-a3de-d14c76b7d3a5"
+      },
+      "source": [
+        "#Set Features:\n",
+        "\n",
+        "#A Dataframe with just the features\n",
+        "train_features = train.drop(columns=[target,'id'])\n",
+        "\n",
+        "#List of the numeric features\n",
+        "numeric_features = train_features.select_dtypes(include='number').columns.tolist()\n",
+        "\n",
+        "# I don't want cat variables with high cardinality:\n",
+        "cardinality = train_features.select_dtypes(exclude='number').nunique()\n",
+        "\n",
+        "#get a list of the categorical features:\n",
+        "categorical_features = cardinality[cardinality<=50].index.tolist()\n",
+        "\n",
+        "#combine lists for features used in model\n",
+        "\n",
+        "features = numeric_features + categorical_features\n",
+        "print(features)"
+      ],
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "['amount_tsh', 'gps_height', 'longitude', 'latitude', 'num_private', 'region_code', 'district_code', 'population', 'construction_year', 'basin', 'region', 'public_meeting', 'recorded_by', 'scheme_management', 'permit', 'extraction_type', 'extraction_type_group', 'extraction_type_class', 'management', 'management_group', 'payment', 'payment_type', 'water_quality', 'quality_group', 'quantity', 'source', 'source_type', 'source_class', 'waterpoint_type', 'waterpoint_type_group']\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iGhLhuO5tl0R",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "X_train = train[features]\n",
+        "y_train = train[target]\n",
+        "\n",
+        "X_val = val[features]\n",
+        "y_val = val[target]\n",
+        "\n",
+        "X_test = test[features]\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "J7WIMwJLxIsn",
+        "colab_type": "text"
+      },
+      "source": [
+        "## Using Pipelines\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wDmin7qDxjGn",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 54
+        },
+        "outputId": "4d92e3fc-74c8-48dc-baee-d980d42f55cb"
+      },
+      "source": [
+        "import category_encoders as ce\n",
+        "from sklearn.impute import SimpleImputer\n",
+        "from sklearn.linear_model import LogisticRegression\n",
+        "from sklearn.pipeline import make_pipeline\n",
+        "from sklearn.preprocessing import StandardScaler\n",
+        "from sklearn.tree import DecisionTreeClassifier\n",
+        "\n",
+        "pipeline = make_pipeline(\n",
+        "    ce.OneHotEncoder(use_cat_names=True),\n",
+        "    SimpleImputer(strategy='mean'),\n",
+        "    DecisionTreeClassifier(random_state = 26,min_samples_leaf=20,criterion='entropy')\n",
+        ")\n",
+        "\n",
+        "#fitting the above model\n",
+        "pipeline.fit(X_train,y_train)\n",
+        "\n",
+        "#accuracy scores\n",
+        "print('Train Accuracy',pipeline.score(X_train,y_train))\n",
+        "print('Validation Accuracy',pipeline.score(X_val,y_val))"
+      ],
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Train Accuracy 0.8102483164983165\n",
+            "Validation Accuracy 0.7657407407407407\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lF371UMhc3_u",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "y_pred = pipeline.predict(X_test)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "aBFY5nQLdAP_",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "submission = test['id']\n",
+        "y_pred_series = pd.Series(y_pred)\n",
+        "submission = pd.concat([submission,y_pred_series],axis=1)\n",
+        "submission.columns=['id','status_group']\n",
+        "submission.to_csv('Assignment_221-KV.csv',index=False)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "dCaLLmV7XeV-",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 737
+        },
+        "outputId": "7f1036ac-5e59-465d-dbd8-919e5404ebe2"
+      },
+      "source": [
+        "leaves = list(range(20,31))\n",
+        "for i in leaves:\n",
+        "  pipeline = make_pipeline(\n",
+        "    ce.OneHotEncoder(use_cat_names=True),\n",
+        "    SimpleImputer(strategy='mean'),\n",
+        "    DecisionTreeClassifier(min_samples_leaf=i,random_state = 26)\n",
+        "  )\n",
+        "\n",
+        "  #fitting the above model\n",
+        "  pipeline.fit(X_train,y_train)\n",
+        "\n",
+        "  #accuracy scores\n",
+        "  print(f'With {i} leaves')\n",
+        "  print('Train Accuracy',pipeline.score(X_train,y_train))\n",
+        "  print('Validation Accuracy',pipeline.score(X_val,y_val))\n"
+      ],
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "With 20 leaves\n",
+            "Train Accuracy 0.8102693602693603\n",
+            "Validation Accuracy 0.7644781144781144\n",
+            "With 21 leaves\n",
+            "Train Accuracy 0.8090698653198654\n",
+            "Validation Accuracy 0.7632996632996633\n",
+            "With 22 leaves\n",
+            "Train Accuracy 0.8084595959595959\n",
+            "Validation Accuracy 0.7648148148148148\n",
+            "With 23 leaves\n",
+            "Train Accuracy 0.8073442760942761\n",
+            "Validation Accuracy 0.7642255892255893\n",
+            "With 24 leaves\n",
+            "Train Accuracy 0.8055976430976431\n",
+            "Validation Accuracy 0.7637205387205387\n",
+            "With 25 leaves\n",
+            "Train Accuracy 0.80368265993266\n",
+            "Validation Accuracy 0.7625420875420875\n",
+            "With 26 leaves\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "error",
+          "ename": "KeyboardInterrupt",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mKeyboardInterrupt\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-16-ce85a22d358f>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     12\u001b[0m   \u001b[0;31m#accuracy scores\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     13\u001b[0m   \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34mf'With {i} leaves'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 14\u001b[0;31m   \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'Train Accuracy'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mpipeline\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mscore\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX_train\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0my_train\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     15\u001b[0m   \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'Validation Accuracy'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0mpipeline\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mscore\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX_val\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0my_val\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/sklearn/utils/metaestimators.py\u001b[0m in \u001b[0;36m<lambda>\u001b[0;34m(*args, **kwargs)\u001b[0m\n\u001b[1;32m    114\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    115\u001b[0m         \u001b[0;31m# lambda, but not partial, allows help() to work with update_wrapper\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 116\u001b[0;31m         \u001b[0mout\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;32mlambda\u001b[0m \u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mobj\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    117\u001b[0m         \u001b[0;31m# update the docstring of the returned function\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    118\u001b[0m         \u001b[0mupdate_wrapper\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mout\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfn\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/sklearn/pipeline.py\u001b[0m in \u001b[0;36mscore\u001b[0;34m(self, X, y, sample_weight)\u001b[0m\n\u001b[1;32m    596\u001b[0m         \u001b[0mXt\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mX\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    597\u001b[0m         \u001b[0;32mfor\u001b[0m \u001b[0m_\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtransform\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_iter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mwith_final\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mFalse\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 598\u001b[0;31m             \u001b[0mXt\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mtransform\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtransform\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mXt\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    599\u001b[0m         \u001b[0mscore_params\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m{\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    600\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0msample_weight\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/category_encoders/one_hot.py\u001b[0m in \u001b[0;36mtransform\u001b[0;34m(self, X, override_return_df)\u001b[0m\n\u001b[1;32m    264\u001b[0m                 \u001b[0;32mraise\u001b[0m \u001b[0mValueError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'Columns to be encoded can not contain new values'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    265\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 266\u001b[0;31m         \u001b[0mX\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget_dummies\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    267\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    268\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdrop_invariant\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/category_encoders/one_hot.py\u001b[0m in \u001b[0;36mget_dummies\u001b[0;34m(self, X_in)\u001b[0m\n\u001b[1;32m    347\u001b[0m             \u001b[0mbase_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmod\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreindex\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mcol\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    348\u001b[0m             \u001b[0mbase_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mbase_df\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mset_index\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mindex\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 349\u001b[0;31m             \u001b[0mX\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mconcat\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mbase_df\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mX\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0maxis\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    350\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    351\u001b[0m             \u001b[0mold_column_index\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcols\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mindex\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcol\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/pandas/core/reshape/concat.py\u001b[0m in \u001b[0;36mconcat\u001b[0;34m(objs, axis, join, join_axes, ignore_index, keys, levels, names, verify_integrity, sort, copy)\u001b[0m\n\u001b[1;32m    256\u001b[0m     )\n\u001b[1;32m    257\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 258\u001b[0;31m     \u001b[0;32mreturn\u001b[0m \u001b[0mop\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget_result\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    259\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    260\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/pandas/core/reshape/concat.py\u001b[0m in \u001b[0;36mget_result\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m    465\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    466\u001b[0m                     \u001b[0mobj_labels\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmgr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0maxes\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0max\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 467\u001b[0;31m                     \u001b[0;32mif\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0mnew_labels\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mequals\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mobj_labels\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    468\u001b[0m                         \u001b[0mindexers\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0max\u001b[0m\u001b[0;34m]\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mobj_labels\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreindex\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnew_labels\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    469\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/pandas/core/indexes/base.py\u001b[0m in \u001b[0;36mequals\u001b[0;34m(self, other)\u001b[0m\n\u001b[1;32m   4397\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   4398\u001b[0m             return array_equivalent(\n\u001b[0;32m-> 4399\u001b[0;31m                 \u001b[0mcom\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mvalues_from_object\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcom\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mvalues_from_object\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mother\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   4400\u001b[0m             )\n\u001b[1;32m   4401\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mException\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/pandas/core/dtypes/missing.py\u001b[0m in \u001b[0;36marray_equivalent\u001b[0;34m(left, right, strict_nan)\u001b[0m\n\u001b[1;32m    430\u001b[0m     \u001b[0;31m# Object arrays can contain None, NaN and NaT.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    431\u001b[0m     \u001b[0;31m# string dtypes must be come to this path for NumPy 1.7.1 compat\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 432\u001b[0;31m     \u001b[0;32mif\u001b[0m \u001b[0mis_string_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mleft\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0mis_string_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mright\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    433\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    434\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0mstrict_nan\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/pandas/core/dtypes/common.py\u001b[0m in \u001b[0;36mis_string_dtype\u001b[0;34m(arr_or_dtype)\u001b[0m\n\u001b[1;32m    742\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mdtype\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mkind\u001b[0m \u001b[0;32min\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0;34m\"O\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"S\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"U\"\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mand\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0mis_period_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdtype\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    743\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 744\u001b[0;31m     \u001b[0;32mreturn\u001b[0m \u001b[0m_is_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0marr_or_dtype\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcondition\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    745\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    746\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/pandas/core/dtypes/common.py\u001b[0m in \u001b[0;36m_is_dtype\u001b[0;34m(arr_or_dtype, condition)\u001b[0m\n\u001b[1;32m   1841\u001b[0m     \u001b[0;32mif\u001b[0m \u001b[0marr_or_dtype\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1842\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0;32mFalse\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1843\u001b[0;31m     \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1844\u001b[0m         \u001b[0mdtype\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0m_get_dtype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0marr_or_dtype\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1845\u001b[0m     \u001b[0;32mexcept\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mTypeError\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mValueError\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mUnicodeEncodeError\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mKeyboardInterrupt\u001b[0m: "
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "hwWAiuUbYML6",
+        "colab_type": "text"
+      },
+      "source": [
+        "I can do this but ideally, I bundle hyperparameters in a struct, \n",
+        "and then store the results in another struct, or a dictionary of some sort. \n",
+        "\n",
+        "From there I can look through the dictionary, df, or however I store it visually, as well as programmatically. \n",
+        "\n",
+        "I could graph how the results change with a change in the hyperparameters, to see how hyperparameters influence the model predictivity.\n",
+        "\n",
+        "To figure out the limits of this, however, I should probably test some values to see what the range of the hyperparameters should be. "
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iR46msd3WWWg",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "models = [DecisionTreeClassifier,LinearRegresson]\n",
+        "for model in models:\n",
+        "  pipeline= make_pipeline(\n",
+        "      \n",
+        "  )"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
