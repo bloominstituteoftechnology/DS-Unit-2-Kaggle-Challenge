@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 
+
 [packages]
 pandas = "*"
 numpy = "*"
@@ -17,6 +18,9 @@ squarify = "==0.4.3"
 ipykernel = "*"
 beautifulsoup4 = "*"
 pyLDAvis = "==2.1.2"
+statsmodels = "*"
+patsy = "*"
+category-encoders = "==2.*"
 
 [requires]
 python_version = "3.7"
