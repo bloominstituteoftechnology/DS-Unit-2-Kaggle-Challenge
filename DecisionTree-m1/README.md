@@ -1,0 +1,25 @@
+### DecisionTree - 221: 
+Worked with Tanzania water pump data. It’s a multi class classification with target label “status group” with three classes “functional”, “non functional” and “functional needs repair”. After loading data,  in addition to the unlabeled test set, the train set was split into train and validation set. Some missing data in geographical coordinates were filled with zero that needed to change back to np.nan. The coordinates on the map were visualized with plotly.express.scatter_mapbox . Wrangling of the data in addition to reverting back the coordinate zeros to nan included dropping one of the duplicate columns “quantity” or “quantity_group”. In the next step, feature selection, high cardinality categorical features with nuique() values more than 50 were dropped. After that we ended up with a mix of numerical and categorical features in addition to the target label. Next train and validation set were split into input features, X and target label, y. In order to prepare data for modeling the following steps in the order needed to be done on X: encoding categorical features, imputing missing values, standardizing the input data, and finally fitting the classification model. This could be done separately or encapsulate all the steps into a pipeline. The benefit of encapsulation is to avoid applying multiple fit_transform methods in each step, and only calling the .fit() method once. Be able to carry out grid search over parameters of all estimators in the pipeline at once. Pipeline streamlines the transformation from one step to another and is less prone to errors due to type or dimension mismatch. make_pipeline() was used to encapsulate all the steps into a single pipeline. With LogisticRegression() we got a validation accuracy of 73%. Pipeline does not have a .coef_() method and we had to use .named_step[‘step string name’] attribute to access the model step and therefore plot the regression coefficients. Similar steps applied to DecisionTreeClassifier() and we achieved higher training accuracy while validation accuracy only slightly improved. Modeling problems with linear relationships between features and target  tend to work better with regression models and those with non-linear relationships work better with tree based estimators. Linear models have coefficients, but trees don't. Instead, they have feature importances, and are accessible by .feature_importances_. Feature importance measures how **early & often** a feature is used for the tree's "branching" decisions. We used graphviz to extract tree data from the fit model and display it graphically. We can increase “min_samples_leaf” or decrease “max_depth” to control the overfitting problem. We used two location features to fit the model and used .predict_proba() to get the probability of “functional” class, and used seaborn.heatmap() to plot the probability of “functional” class vs the two “latitude” and “longitude” features. This allowed us to visualize the fitting process as we change the hyper-parameters of DecisionTreeClassifier(). Applying the same visualization technique to LogisticRegression() shows a linear gradient of color change in heatmap, while the DecisionTreeClassifier() becomes highly non-linear as the tree depth increases. As a second experiment we took a small set of data for golf putting and examined the fitting of one feature, “distance” vs target “rate of success”.  This was visualized by plotting a scatter plot of y vs X. In a linear regression we use .predict() method to overlay the linear regression line over the truth scatter plot and for DecisionTreeRegressor() used a .step() plot to visualize predicted points. By increasing the tree depth, the tree creates more decision conditions for more samples of input data points (“distance”) to fit them to the corresponding target, and we can visualize the over fitting process as the max_depth increases. Last dataset is a simplified housing data with two input features (GoodLocation and BigSize) vs target (Price). We compared LinearRegression() and DecisionTreeRegressor() to compare the two. As Price data is manipulated to deviate from a linear fit, LinearRegression() fails to maintain a R2 score of 1 as it strictly follows linear fitting, However, DecisionTreeRegressor() mains the perfect score of R2=1 as it leverages its nonlinear capability. 
+
+**Libraries:**
+```
+import pandas as pd
+import numpy as np
+from pandas_profiling import ProfileReport
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
+import graphviz
+import category_encoders as ce
+import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
+import itertools
+from math import floor
+from IPython.display import display, HTML
+```
+
+https://github.com/skhabiri/PredictiveModeling-TreeBasedModels-u2s2/tree/master/DecisionTree-m1
