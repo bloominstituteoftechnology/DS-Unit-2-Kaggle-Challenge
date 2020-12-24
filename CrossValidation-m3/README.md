@@ -9,8 +9,8 @@ A pipeline estimator of OneHotEncoder(), SimpleImputer(), StandardScaler(), Sele
 For the ‘Submission’ file, containing the target label prediction, we can have multiple predictions from different hyperparameter tuning and take the majority vote as the final prediction with .mode(). This is similar to the ensemble concept.
 
 *Libraries:*
-
-`import numpy as np
+```
+import numpy as np
 
 import pandas as pd
 
@@ -42,4 +42,6 @@ import matplotlib.pyplot as plt
 
 from scipy.stats import randint, uniform
 
-from sklearn.metrics import mean_absolute_error`
+from sklearn.metrics import mean_absolute_error
+```
+
