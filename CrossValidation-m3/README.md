@@ -11,37 +11,21 @@ For the ‘Submission’ file, containing the target label prediction, we can ha
 *Libraries:*
 ```
 import numpy as np
-
 import pandas as pd
-
 from pandas_profiling import ProfileReport
-
 from category_encoders import OneHotEncoder, OrdinalEncoder, TargetEncoder
-
 from sklearn.feature_selection import f_regression, SelectKBest
-
 from sklearn.impute import SimpleImputer
-
 from sklearn.linear_model import Ridge
-
 from sklearn.model_selection import cross_val_score, validation_curve
-
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
-
 from sklearn.pipeline import make_pipeline
-
 from sklearn.preprocessing import StandardScaler
-
 from sklearn.ensemble import RandomForestRegressor
-
 from sklearn.tree import DecisionTreeRegressor
-
 from sklearn import set_config
-
 import matplotlib.pyplot as plt
-
 from scipy.stats import randint, uniform
-
 from sklearn.metrics import mean_absolute_error
 ```
 
