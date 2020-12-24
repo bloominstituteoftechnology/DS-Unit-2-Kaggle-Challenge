@@ -10,7 +10,7 @@ For the ‘Submission’ file, containing the target label prediction, we can ha
 
 *Libraries:*
 
-import numpy as np
+`import numpy as np
 import pandas as pd
 from pandas_profiling import ProfileReport
 from category_encoders import OneHotEncoder, OrdinalEncoder, TargetEncoder
@@ -26,4 +26,4 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn import set_config
 import matplotlib.pyplot as plt
 from scipy.stats import randint, uniform
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error`
