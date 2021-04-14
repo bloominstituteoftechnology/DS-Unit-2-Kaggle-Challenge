@@ -19,6 +19,7 @@ scipy  = "*"
 seaborn = "*"
 sklearn = "*"
 nbgrader = "*"
+nb-clean = "*"
 
 [requires]
 python_version = "3.8"
